@@ -13,14 +13,21 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
 import java.io.File;
-import java.util.Vector;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import java.util.*;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.swing.JOptionPane;
 
 public class Driver extends JPanel implements ActionListener, KeyListener {
 	
@@ -40,6 +47,8 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 	int timerDelay = 1000;													//delay in milliseconds of timer
 	int secondsPassed = 0;													//seconds that have passed since user started game
 	JLabel timeDisplay = new JLabel(Integer.toString(secondsPassed));		//holds the same value as seconds passed but in JLabel form
+	Board board = new Board();
+	private HashMap<Coordinate, Tile> gameBoard = board.generateBoard();
 	
 	//only do drawing for paint
 	public void paint(Graphics g) {
@@ -51,8 +60,6 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 		
 		//updating the display of the timer
 		timeDisplay.setText(Integer.toString(secondsPassed));
-		
-		
 		
 		if(secondsPassed>3) {	//change this if statement later according to bombs
 		//lose condition
@@ -69,7 +76,29 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 	
 	public static void main(String[] arg) {
 		Driver d = new Driver();
+		playMusic("Minesweeper_Game_Boy_Theme-7zrL98CGCEQ2.wav");
 	}
+	
+	public static void playMusic(String filepath){
+			
+		    try {
+		      File file = new File("Minesweeper_Game_Boy_Theme-7zrL98CGCEQ2.wav");
+		      AudioInputStream stream = AudioSystem.getAudioInputStream(file);
+		      Clip clip = AudioSystem.getClip();
+		      clip.open(stream);
+		      clip.start();
+		 
+		      //sleep to allow enough time for the clip to play
+		      Thread.sleep(310200);
+		 
+		      stream.close();
+		 
+		    } catch (Exception ex) {
+		      System.out.println(ex.getMessage());
+		    }
+			
+		}
+	
 	public Driver(){
 		
 		//starter code
@@ -81,6 +110,14 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 		f.setResizable(false);
 		f.setLayout(null);
 		f.addKeyListener(this);
+		
+		
+		/*
+		 * 
+		 * testing below
+		 * 
+		 */
+		
 		
 		//timer implementation
 		timeDisplay.setForeground(Color.RED);
