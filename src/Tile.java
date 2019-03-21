@@ -3,21 +3,29 @@ import java.util.HashMap;
 
 public class Tile {
 	
-	private Coordinate coordinate;
+	private String coordinate;
 	private boolean isBomb;
 	private int adjBombs; 
+	private boolean isDiscovered = false;
 	
-	public Tile( Coordinate coord, boolean bomb, int adjacent) {
+	//NON-BOMB TILE
+	public Tile(String coord, boolean bomb, int adjacent) {
 		coord = coordinate; 
 		bomb = isBomb;
 		adjacent = adjBombs; 
 	}
+	
+	//BOMB TILE
+	public Tile(String coord, boolean bomb) {
+		coord = coordinate; 
+		bomb = isBomb;
+	}
 
-	public Coordinate getCoordinate() {
+	public String getCoordinate() {
 		return coordinate;
 	}
 
-	public void setCoordinate(Coordinate coordinate) {
+	public void setCoordinate(String coordinate) {
 		this.coordinate = coordinate;
 	}
 

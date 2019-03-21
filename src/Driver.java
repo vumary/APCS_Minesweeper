@@ -48,7 +48,7 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 	int secondsPassed = 0;													//seconds that have passed since user started game
 	JLabel timeDisplay = new JLabel(Integer.toString(secondsPassed));		//holds the same value as seconds passed but in JLabel form
 	Board board = new Board();
-	private HashMap<Coordinate, Tile> gameBoard = board.generateBoard();
+	private HashMap<String, Tile> gameBoard = board.generateBoard();
 	
 	//only do drawing for paint
 	public void paint(Graphics g) {
@@ -112,12 +112,12 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 		f.addKeyListener(this);
 		
 		
-		/*
-		 * 
-		 * testing below
-		 * 
-		 */
+		System.out.println("TESTING---------------------------------------------------------------");
 		
+		//board.printBombCoords();
+		//System.out.println(board.getBombCoords().size());
+		
+		System.out.println("----------------------------------------------------------------------");
 		
 		//timer implementation
 		timeDisplay.setForeground(Color.RED);
