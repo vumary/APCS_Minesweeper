@@ -42,13 +42,17 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 	String hourglass_img = "MinesweeperHourglass64x64.png";
 	String lose_img = "MinesweeperDeadFace64x64.png";
 	String win_img = "MinesweeperHappyFace64x64.png";
+	String singleTile_img = "MinesweeperSingleTile_40x40.png";
+	String bomb_img = "MinesweeperBomb32x32.png";
 	
 	//variables
 	int timerDelay = 1000;													//delay in milliseconds of timer
 	int secondsPassed = 0;													//seconds that have passed since user started game
 	JLabel timeDisplay = new JLabel(Integer.toString(secondsPassed));		//holds the same value as seconds passed but in JLabel form
 	Board board = new Board();
-	private HashMap<String, Tile> gameBoard = board.generateBoard();
+	HashMap<String, Tile> gameBoard = board.generateBoard();
+	Mouse mouse = new Mouse();
+	boolean lostTheGame = false;
 	
 	//only do drawing for paint
 	public void paint(Graphics g) {
@@ -61,9 +65,41 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 		//updating the display of the timer
 		timeDisplay.setText(Integer.toString(secondsPassed));
 		
-		if(secondsPassed>3) {	//change this if statement later according to bombs
-		//lose condition
+		//if you lost the game then show the sad face image
+		if(lostTheGame) { 
 		lose.setVisible(true);
+		}
+		
+		//click and disappear Tiles
+		for(int r = 0; r < board.getRows(); r++) {
+			for(int c = 0; c < board.getCols(); c++) {
+				
+				Tile tempTile = gameBoard.get(r+" "+c);
+				
+				if(mouse.getX()>tempTile.getX()&&
+				mouse.getX()<tempTile.get_x()&&
+				mouse.getY()>tempTile.getY()&&
+				mouse.getY()<tempTile.get_y()&&
+				mouse.isLeftClick()) {
+					
+					//if you click any tile then an adjTiles stack will be initialized for it
+					tempTile.fillAdjTiles(r, c, gameBoard);
+					
+					//not including diagonals
+					System.out.println("AMOUNT OF NEIGHBOR BOMBS: "+tempTile.getAdjBombTiles().size());
+					
+					//if you click on a bomb tile then you lose
+					if(tempTile.getBomb()) {
+						lostTheGame = true;
+					}
+					
+					tempTile.setDiscovered(true);
+					tempTile.getImg().setVisible(false);
+					
+				}
+				
+				
+			}
 		}
 		
 	}//end of update method - put code above for any updates on variable
@@ -76,9 +112,13 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 	
 	public static void main(String[] arg) {
 		Driver d = new Driver();
-		playMusic("Minesweeper_Game_Boy_Theme-7zrL98CGCEQ2.wav");
+		
+		//music implementation
+		//playMusic("Minesweeper_Game_Boy_Theme-7zrL98CGCEQ2.wav");
 	}
 	
+	/*
+	//music implementation
 	public static void playMusic(String filepath){
 			
 		    try {
@@ -98,6 +138,7 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 		    }
 			
 		}
+		*/
 	
 	public Driver(){
 		
@@ -116,6 +157,11 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 		
 		//board.printBombCoords();
 		//System.out.println(board.getBombCoords().size());
+		//board.printGameBoard();
+		Tile test = gameBoard.get("0 0");
+		//System.out.println("test tile: "+test);
+		//test.printGameBoard();
+		//why do they not share the same gameboard
 		
 		System.out.println("----------------------------------------------------------------------");
 		
@@ -133,8 +179,31 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 		new Timer(timerDelay, taskPerformer).start();
 		
 		//mouse input
-		f.getContentPane().addMouseListener(new Mouse());
-
+		f.getContentPane().addMouseListener(mouse);
+		
+		//creating all tiles on board
+		for(int r = 0; r < board.getRows(); r++) {
+			for(int c = 0; c < board.getCols(); c++) {
+				
+				Tile tempTile = gameBoard.get(r+" "+c);	//accesses each tile from the gameBoard hashmap
+				tempTile.setX((c*48)+48);				//converts the index coordinates to pixel coordinates for GUI placement
+				tempTile.setY((r*48)+216);				//converts the index coordinates to pixel coordinates for GUI placement
+				f.add(tempTile.getImg());				//add image to GUI
+				
+				if(tempTile.getBomb()) {
+					
+					//adding bomb image
+					ImageIcon bmb = new ImageIcon(src+bomb_img);
+					JLabel bomb = new JLabel(bmb);
+					bomb.setBounds(((c*48)+35), ((r*48)+205), 64, 64);
+					f.add(bomb);
+					
+				}
+				
+			}
+		}
+		
+		
 		//adding happy face image
 		ImageIcon ls = new ImageIcon(src+lose_img);
 		lose = new JLabel(ls);

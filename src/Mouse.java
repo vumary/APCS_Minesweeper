@@ -7,6 +7,7 @@ public class Mouse extends MouseAdapter {
 	
 	private int x;
 	private int y;
+	private boolean leftClick;
 	
 	public Mouse() {}
 	
@@ -17,12 +18,37 @@ public class Mouse extends MouseAdapter {
 		y = e.getY();
 		
 		if(SwingUtilities.isLeftMouseButton(e)) {
-			System.out.print("left click. ");
-			System.out.println(x+", "+y);
+			leftClick = true;
 		}
 		else {
-			System.out.print("right click. ");
-			System.out.println(x+", "+y);
+			leftClick = false;
 		}
 	}
+
+	public int getX() {
+		return x;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public boolean isLeftClick() {
+		return leftClick;
+	}
+
+	public void setLeftClick(boolean leftClick) {
+		this.leftClick = leftClick;
+	}
+	
+	
+	
 }

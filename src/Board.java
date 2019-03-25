@@ -1,14 +1,15 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Stack;
 
 
 public class Board {
 	
 
-	private HashMap<String, Tile> gameBoard = new HashMap<String, Tile>();	//hold all tiles
-	private int rows;														//amount of "rows" in hashmap
-	private int cols; 														//amount of "cols" in hashmap
+	protected HashMap<String, Tile> gameBoard = new HashMap<String, Tile>();	//hold all tiles
+	protected int rows;														//amount of "rows" in hashmap
+	protected int cols; 														//amount of "cols" in hashmap
 	private int bombCount;													//amount of bombs on the board
 	private ArrayList<String> bombCoords = new ArrayList<String>();			//contains the coordinates of every bomb
 
@@ -44,6 +45,14 @@ public class Board {
 		return false;
 	}
 	
+	public void printGameBoard() {
+		for(int r = 0; r < rows; r++) {
+			for(int c = 0; c < cols; c++) {
+				System.out.println(gameBoard.get(r+" "+c));
+			}
+		}
+	}
+		
 	//generate 26 bombs then fill the rest of the board with none bomb tiles
 	public HashMap<String, Tile> generateBoard(){ 
 		
@@ -58,14 +67,11 @@ public class Board {
 			String bC = rand.nextInt(cols)+"";	//whole number [0, 15)
 			String coords = bR+" "+bC;
 			
-			//while the coords are in the bombCoord
 			//re-assign the coordinate b/c we don't want bombs to overlap
 			while(inBombCoords(coords)) {
 				bR = rand.nextInt(rows)+""; 				//random int between 0 and 11; randomly assigned row
 				bC = rand.nextInt(cols)+""; 				//random int between 0 and 15; randomly assigned col
-				coords = bR+" "+bC;								//creating a new coordinate respective to the bombs location
-				System.out.println("ENTERED WHILE LOOP");
-
+				coords = bR+" "+bC;							//creating a new coordinate respective to the bombs location
 			}
 			
 			Tile bTile = new Tile(coords, true);
@@ -85,10 +91,11 @@ public class Board {
 				
 				//if row and column is NOT in bomb coords
 				if(!inBombCoords(tempCoord)) {
+					
 					//need to create a non-bomb tile with adjacent things
-					//public Tile(String coord, boolean bomb, int adjacent)
 					Tile tempTile = new Tile(tempCoord, false);
 					gameBoard.put(tempCoord, tempTile);
+					
 				}
 			}
 		}
