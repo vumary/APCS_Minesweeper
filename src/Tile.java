@@ -57,6 +57,35 @@ public class Tile extends Board{
 			if(notDone) {
 			
 			notDone = false;
+			
+			//adding the top-left tile to the stack
+			if((r-1>0)&&(c-1>0)) {
+				if(gameBoard.get((r-1)+" "+(c-1)).isBomb()) {
+					adjBombTiles.push(gameBoard.get((r-1)+" "+(c-1)));
+				}
+			}
+			
+			//adding the bottom-left tile to the stack
+			if((r+1<rows-1)&&(c-1>0)) {
+				if(gameBoard.get((r+1)+" "+(c-1)).isBomb()) {
+					adjBombTiles.push(gameBoard.get((r+1)+" "+(c-1)));
+				}
+			}
+			
+			//adding the top-right tile to the stack
+			if((r-1>0)&&(c+1<cols-1)) {
+				if(gameBoard.get((r-1)+" "+(c+1)).isBomb()) {
+					adjBombTiles.push(gameBoard.get((r-1)+" "+(c+1)));
+				}
+			}
+			
+			//adding the bottom-right tile to the stack
+			if((r+1<rows-1)&&(c+1<cols-1)) {
+				if(gameBoard.get((r+1)+" "+(c+1)).isBomb()) {
+					adjBombTiles.push(gameBoard.get((r+1)+" "+(c+1)));
+				}
+			}
+			
 			//adding the left tile to the stack
 			if(r-1>0) {
 				
