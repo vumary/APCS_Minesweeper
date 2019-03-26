@@ -9,33 +9,18 @@ import javax.swing.JLabel;
 public class Tile extends Board{
 	
 	private String coordinate;
+	private boolean flagged = false;		
 	private boolean isBomb;
 	private int adjBombs; 
 	private boolean isDiscovered = false;
-	private JLabel img;
+	private JLabel img;						//tile png image
+	private JLabel flag_img;				//flag png image
 	private int x = 0, y = 0;				//pixel coordinate of where the top left corner of the tile is located
 	private int _x, _y; 					//pixel coordinate of where the bottom right corner of the tile is located
 	private int width = 40, height = 40;
 	//NOTE: .push() to add from top / .pop() to remove from top
 	private Stack adjBombTiles = new Stack<Tile>();								//contains all the neighbor tile objects
 	private boolean notDone = true;
-	
-	//NON-BOMB TILE CONSTRUCTOR
-	public Tile(String coordinate, boolean isBomb, int adjBombs) {
-		
-		//JLabel that contains the same single tile image for each Tile object
-		String src = new File("").getAbsolutePath()+"/src/";
-		ImageIcon ghost = new ImageIcon(src+"MinesweeperSingleTile_40x40.png");
-		img = new JLabel(ghost); //connect 
-		
-		//bound img to the objects
-		img.setBounds(x, y, width, height);
-		
-		//argument variables
-		this.coordinate = coordinate;
-		this.isBomb = isBomb;
-		this.adjBombs = adjBombs;
-	}
 	
 	//BOMB TILE CONSTRUCTOR
 	public Tile(String coordinate, boolean isBomb) {
@@ -45,8 +30,13 @@ public class Tile extends Board{
 		ImageIcon ghost = new ImageIcon(src+"MinesweeperSingleTile_40x40.png");
 		img = new JLabel(ghost); //connect 
 		
+		//JLabel that contains the same flag image for each Tile object
+		ImageIcon _ghost = new ImageIcon(src+"MinesweeperFlag32x32.png");
+		flag_img = new JLabel(_ghost); //connect 
+		
 		//bound img to the object
 		img.setBounds(x, y, width, height);
+		flag_img.setBounds(x, y, width, height);
 		
 		this.coordinate = coordinate; 
 		this.isBomb = isBomb;
@@ -59,37 +49,36 @@ public class Tile extends Board{
 			notDone = false;
 			
 			//adding the top-left tile to the stack
-			if((r-1>0)&&(c-1>0)) {
+			if((r-1>=0)&&(c-1>=0)) {
 				if(gameBoard.get((r-1)+" "+(c-1)).isBomb()) {
 					adjBombTiles.push(gameBoard.get((r-1)+" "+(c-1)));
 				}
 			}
 			
 			//adding the bottom-left tile to the stack
-			if((r+1<rows-1)&&(c-1>0)) {
+			if((r+1<=rows-1)&&(c-1>=0)) {
 				if(gameBoard.get((r+1)+" "+(c-1)).isBomb()) {
 					adjBombTiles.push(gameBoard.get((r+1)+" "+(c-1)));
 				}
 			}
 			
 			//adding the top-right tile to the stack
-			if((r-1>0)&&(c+1<cols-1)) {
+			if((r-1>=0)&&(c+1<=cols-1)) {
 				if(gameBoard.get((r-1)+" "+(c+1)).isBomb()) {
 					adjBombTiles.push(gameBoard.get((r-1)+" "+(c+1)));
 				}
 			}
 			
 			//adding the bottom-right tile to the stack
-			if((r+1<rows-1)&&(c+1<cols-1)) {
+			if((r+1<=rows-1)&&(c+1<=cols-1)) {
 				if(gameBoard.get((r+1)+" "+(c+1)).isBomb()) {
 					adjBombTiles.push(gameBoard.get((r+1)+" "+(c+1)));
 				}
 			}
 			
 			//adding the left tile to the stack
-			if(r-1>0) {
+			if(r-1>=0) {
 				
-				//if tile isn't discovered then add it to the adjBombStack stack
 				if(gameBoard.get((r-1)+" "+c).isBomb()) {
 					adjBombTiles.push(gameBoard.get((r-1)+" "+c));
 				}
@@ -97,9 +86,8 @@ public class Tile extends Board{
 			}
 			
 			//adding the right tile to the stack
-			if(r+1<rows-1) {
+			if(r+1<=rows-1) {
 				
-				//if tile isn't discovered then add it to the adjBombStack stack
 				if(gameBoard.get((r+1)+" "+c).isBomb()) {	
 					adjBombTiles.push(gameBoard.get((r+1)+" "+c));
 				}
@@ -107,9 +95,8 @@ public class Tile extends Board{
 			}
 			
 			//adding the top tile to the stack
-			if(c-1>0) {
+			if(c-1>=0) {
 				
-				//if tile isn't discovered then add it to the adjBombStack stack
 				if(gameBoard.get(r+" "+(c-1)).isBomb()) {
 					adjBombTiles.push(gameBoard.get(r+" "+(c-1)));
 				}
@@ -117,9 +104,8 @@ public class Tile extends Board{
 			}
 			
 			//adding the bottom tile to the stack
-			if(c+1<cols-1) {
+			if(c+1<=cols-1) {
 				
-				//if tile isn't discovered then add it to the adjBombStack stack
 				if(gameBoard.get(r+" "+(c+1)).isBomb()) {
 					adjBombTiles.push(gameBoard.get(r+" "+(c+1)));
 				}
@@ -176,6 +162,7 @@ public class Tile extends Board{
 
 	public void setX(int x) {
 		img.setBounds(x, y, width, height);
+		flag_img.setBounds(x, y, width, height);
 		this.x = x;
 		this._x = x + 40;
 	}
@@ -186,6 +173,7 @@ public class Tile extends Board{
 
 	public void setY(int y) {
 		img.setBounds(x, y, width, height);
+		flag_img.setBounds(x, y, width, height);
 		this.y = y;
 		
 		this._y = y + 40;
@@ -234,6 +222,36 @@ public class Tile extends Board{
 	public boolean isBomb() {
 		return isBomb;
 	}
+
+	public JLabel getFlag_img() {
+		return flag_img;
+	}
+
+	public void setFlag_img(JLabel flag_img) {
+		this.flag_img = flag_img;
+	}
+
+	public boolean isNotDone() {
+		return notDone;
+	}
+
+	public void setNotDone(boolean notDone) {
+		this.notDone = notDone;
+	}
+
+	public void setAdjBombTiles(Stack adjBombTiles) {
+		this.adjBombTiles = adjBombTiles;
+	}
+
+	public boolean isFlagged() {
+		return flagged;
+	}
+
+	public void setFlagged(boolean flagged) {
+		this.flagged = flagged;
+	}
+	
+	
 	
 }
 

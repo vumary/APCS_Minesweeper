@@ -44,15 +44,32 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 	String win_img = "MinesweeperHappyFace64x64.png";
 	String singleTile_img = "MinesweeperSingleTile_40x40.png";
 	String bomb_img = "MinesweeperBomb32x32.png";
+	String one_img = "Minesweeper1_32x32.png";
+	String two_img = "Minesweeper2_32x32.png";
+	String three_img = "Minesweeper3_32x32.png";
+	String four_img = "Minesweeper4_32x32.png";
+	String flag_img = "MinesweeperFlag64x64.png";
+	String small_flag_img = "MinesweeperFlag32x32.png";
 	
 	//variables
+	Mouse mouse = new Mouse();												//mouse used for right and left click
 	int timerDelay = 1000;													//delay in milliseconds of timer
 	int secondsPassed = 0;													//seconds that have passed since user started game
-	JLabel timeDisplay = new JLabel(Integer.toString(secondsPassed));		//holds the same value as seconds passed but in JLabel form
-	Board board = new Board();
-	HashMap<String, Tile> gameBoard = board.generateBoard();
-	Mouse mouse = new Mouse();
-	boolean lostTheGame = false;
+	int flagCount = mouse.getFlagCount();														//26 - # of flags placed
+	JLabel timeDisplay = new JLabel(Integer.toString(secondsPassed));		//holds the same value as secondPassed but in JLabel form
+	JLabel flagCountDisplay = new JLabel(Integer.toString(flagCount));		//holds the same value as flagCount but in JLabel form
+	Board board = new Board();												//board object created just to use its functionality/ methods
+	HashMap<String, Tile> gameBoard = board.generateBoard();				//gameBoard which is the hub of all tile objects
+	boolean lostTheGame = false;											//game status; have they lose yet?
+	
+	ActionListener taskPerformer = new ActionListener() {
+	    public void actionPerformed(ActionEvent evt) {
+	    	//increments secondsPassed every second
+	    	secondsPassed++;
+	    }
+	};
+	
+	Timer timer = new Timer(timerDelay, taskPerformer);
 	
 	//only do drawing for paint
 	public void paint(Graphics g) {
@@ -65,8 +82,12 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 		//updating the display of the timer
 		timeDisplay.setText(Integer.toString(secondsPassed));
 		
+		//updating the display of flag count
+		flagCountDisplay.setText(Integer.toString(mouse.getFlagCount()));
+		
 		//if you lost the game then show the sad face image
 		if(lostTheGame) { 
+		timer.stop();
 		lose.setVisible(true);
 		}
 		
@@ -79,24 +100,24 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 				if(mouse.getX()>tempTile.getX()&&
 				mouse.getX()<tempTile.get_x()&&
 				mouse.getY()>tempTile.getY()&&
-				mouse.getY()<tempTile.get_y()&&
-				mouse.isLeftClick()) {
+				mouse.getY()<tempTile.get_y()) {
 					
-					//if you click any tile then an adjTiles stack will be initialized for it
-					tempTile.fillAdjTiles(r, c, gameBoard);
-					
-					//not including diagonals
-					System.out.println("AMOUNT OF NEIGHBOR BOMBS: "+tempTile.getAdjBombTiles().size());
-					
-					//if you click on a bomb tile then you lose
-					if(tempTile.getBomb()) {
-						lostTheGame = true;
+					if(mouse.isLeftClick()) {
+						//if you click on a bomb tile then you lose
+						if(tempTile.getBomb()) {
+							lostTheGame = true;
+						}
+						
+						tempTile.setDiscovered(true);
+						tempTile.getImg().setVisible(false);
 					}
 					
-					tempTile.setDiscovered(true);
-					tempTile.getImg().setVisible(false);
+					if((!mouse.isLeftClick())&&(!tempTile.isFlagged())) {
+						tempTile.getFlag_img().setVisible(true);
+					}
 					
 				}
+				
 				
 				
 			}
@@ -114,10 +135,9 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 		Driver d = new Driver();
 		
 		//music implementation
-		//playMusic("Minesweeper_Game_Boy_Theme-7zrL98CGCEQ2.wav");
+		playMusic("Minesweeper_Game_Boy_Theme-7zrL98CGCEQ2.wav");
 	}
 	
-	/*
 	//music implementation
 	public static void playMusic(String filepath){
 			
@@ -138,7 +158,7 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 		    }
 			
 		}
-		*/
+	
 	
 	public Driver(){
 		
@@ -152,31 +172,18 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 		f.setLayout(null);
 		f.addKeyListener(this);
 		
-		
-		System.out.println("TESTING---------------------------------------------------------------");
-		
-		//board.printBombCoords();
-		//System.out.println(board.getBombCoords().size());
-		//board.printGameBoard();
-		Tile test = gameBoard.get("0 0");
-		//System.out.println("test tile: "+test);
-		//test.printGameBoard();
-		//why do they not share the same gameboard
-		
-		System.out.println("----------------------------------------------------------------------");
-		
 		//timer implementation
 		timeDisplay.setForeground(Color.RED);
 		timeDisplay.setBounds(620,67,120,50);
 		timeDisplay.setFont(timeDisplay.getFont().deriveFont(64.0f));
 		f.add(timeDisplay);
-		ActionListener taskPerformer = new ActionListener() {
-		    public void actionPerformed(ActionEvent evt) {
-		    	//increments secondsPassed every second
-		    	secondsPassed++;
-		    }
-		};
-		new Timer(timerDelay, taskPerformer).start();
+		timer.start();
+		
+		//flag count display implementation
+		flagCountDisplay.setForeground(Color.RED);
+		flagCountDisplay.setBounds(80,67,120,50);
+		flagCountDisplay.setFont(flagCountDisplay.getFont().deriveFont(64.0f));
+		f.add(flagCountDisplay);
 		
 		//mouse input
 		f.getContentPane().addMouseListener(mouse);
@@ -188,7 +195,18 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 				Tile tempTile = gameBoard.get(r+" "+c);	//accesses each tile from the gameBoard hashmap
 				tempTile.setX((c*48)+48);				//converts the index coordinates to pixel coordinates for GUI placement
 				tempTile.setY((r*48)+216);				//converts the index coordinates to pixel coordinates for GUI placement
-				f.add(tempTile.getImg());				//add image to GUI
+				
+				//adding flag image
+				f.add(tempTile.getFlag_img());
+				
+				//adding tile image to GUI
+				f.add(tempTile.getImg());
+				tempTile.getFlag_img().setVisible(false);
+				
+				//initialize all adjBomb variables of each tile
+				tempTile.fillAdjTiles(r, c, gameBoard);
+				int temp = tempTile.getAdjBombTiles().size();
+				tempTile.setAdjBombs(temp);
 				
 				if(tempTile.getBomb()) {
 					
@@ -200,9 +218,37 @@ public class Driver extends JPanel implements ActionListener, KeyListener {
 					
 				}
 				
+				//add number display of adjacent bombs here
+				String temp_img ="";
+				if(tempTile.getAdjBombs()==1) {
+					temp_img = one_img;
+				}
+				
+				if(tempTile.getAdjBombs()==2) {
+					temp_img = two_img;
+				}
+				
+				if(tempTile.getAdjBombs()==3) {
+					temp_img = three_img;
+				}
+				
+				if(tempTile.getAdjBombs()==4) {
+					temp_img = four_img;
+				}
+				
+				ImageIcon num = new ImageIcon(src+temp_img);
+				JLabel number = new JLabel(num);
+				number.setBounds(((c*48)+35), ((r*48)+205), 64, 64);
+				f.add(number);
+				
 			}
 		}
 		
+		//adding flag image
+		ImageIcon fg = new ImageIcon(src+flag_img);
+		JLabel flag = new JLabel(fg);
+		flag.setBounds(210, 65, 64, 64);
+		f.add(flag);
 		
 		//adding happy face image
 		ImageIcon ls = new ImageIcon(src+lose_img);
